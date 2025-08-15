@@ -1481,39 +1481,96 @@ closePreviewBtn?.addEventListener('click', () => {
 });
 
 // Global functions for onclick handlers
+// ==============================================================================
+// KODE YANG DIPERBARUI
+// ==============================================================================
 window.editData = async function(id) {
     try {
-        // Fetch data by ID untuk edit
+        // Fetch data by ID to edit
         const res = await fetch(`/api/pencatatan/${id}`, { credentials: 'include' });
         const data = await res.json();
-        
+
         if (data.error) {
             showNotification('Data tidak ditemukan', 'error');
             return;
         }
-        
-        // Tampilkan form edit dengan SweetAlert2
+
+        // Format date for the input type="date" field
+        const formattedRegDate = data.reg_date ? new Date(data.reg_date).toISOString().split('T')[0] : '';
+
+        // Show edit form with SweetAlert2, now including all editable fields
         const { value: formValues } = await Swal.fire({
             title: `Edit Data - No. Reg: ${data.reg_number}`,
             html: `
-                <div style="text-align: left;">
-                    <div style="margin-bottom: 15px;">
-                        <label>NIK Pemohon:</label>
-                        <input id="edit-nik" class="swal2-input" value="${data.nik || ''}" maxlength="16" style="margin: 5px 0;">
+                <div style="text-align: left; max-height: 70vh; overflow-y: auto; padding-right: 15px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div style="margin-bottom: 10px;">
+                            <label>No. Registrasi:</label>
+                            <input id="edit-reg-number" class="swal2-input" value="${data.reg_number || ''}" style="margin: 5px 0;">
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                            <label>Tanggal Registrasi:</label>
+                            <input id="edit-reg-date" type="date" class="swal2-input" value="${formattedRegDate}" style="margin: 5px 0;">
+                        </div>
                     </div>
-                    <div style="margin-bottom: 15px;">
-                        <label>Nama Pemohon:</label>
-                        <input id="edit-name" class="swal2-input" value="${data.name || ''}" style="margin: 5px 0;">
+
+                    <div style="margin-bottom: 10px;">
+                        <label>Kode Layanan:</label>
+                        <select id="edit-service-code" class="swal2-input" style="margin: 5px 0;">
+                            <option value="P" ${data.service_code === 'P' ? 'selected' : ''}>P - Pindah</option>
+                            <option value="D" ${data.service_code === 'D' ? 'selected' : ''}>D - Datang</option>
+                            <option value="B" ${data.service_code === 'B' ? 'selected' : ''}>B - Batal</option>
+                            <option value="BP" ${data.service_code === 'BP' ? 'selected' : ''}>BP - Batal & Pindah Ulang</option>
+                            <option value="PSD" ${data.service_code === 'PSD' ? 'selected' : ''}>PSD - Pindah Satu Desa</option>
+                            <option value="L" ${data.service_code === 'L' ? 'selected' : ''}>L - Lokal</option>
+                        </select>
                     </div>
-                    <div style="margin-bottom: 15px;">
-                        <label>No. HP:</label>
-                        <input id="edit-phone" class="swal2-input" value="${data.phone_number || ''}" style="margin: 5px 0;">
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div style="margin-bottom: 10px;">
+                            <label>NIK Pemohon:</label>
+                            <input id="edit-nik" class="swal2-input" value="${data.nik || ''}" maxlength="16" style="margin: 5px 0;">
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                            <label>Nama Pemohon:</label>
+                            <input id="edit-name" class="swal2-input" value="${data.name || ''}" style="margin: 5px 0;">
+                        </div>
                     </div>
-                    <div style="margin-bottom: 15px;">
-                        <label>Email:</label>
-                        <input id="edit-email" class="swal2-input" value="${data.email || ''}" type="email" style="margin: 5px 0;">
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div style="margin-bottom: 10px;">
+                            <label>No. HP:</label>
+                            <input id="edit-phone" class="swal2-input" value="${data.phone_number || ''}" style="margin: 5px 0;">
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                            <label>Email:</label>
+                            <input id="edit-email" class="swal2-input" value="${data.email || ''}" type="email" style="margin: 5px 0;">
+                        </div>
                     </div>
-                    <div style="margin-bottom: 15px;">
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div style="margin-bottom: 10px;">
+                            <label>No. SKPWNI:</label>
+                            <input id="edit-no-skpwni" class="swal2-input" value="${data.no_skpwni || ''}" style="margin: 5px 0;">
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                            <label>No. SKDWNI:</label>
+                            <input id="edit-no-skdwni" class="swal2-input" value="${data.no_skdwni || ''}" style="margin: 5px 0;">
+                        </div>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div style="margin-bottom: 10px;">
+                            <label>No. KK:</label>
+                            <input id="edit-no-kk" class="swal2-input" value="${data.no_kk || ''}" style="margin: 5px 0;">
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                            <label>No. SKBWNI:</label>
+                            <input id="edit-no-skbwni" class="swal2-input" value="${data.no_skbwni || ''}" style="margin: 5px 0;">
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 10px;">
                         <label>Status:</label>
                         <select id="edit-status" class="swal2-input" style="margin: 5px 0;">
                             <option value="DIPROSES" ${data.status === 'DIPROSES' ? 'selected' : ''}>Diproses</option>
@@ -1521,22 +1578,31 @@ window.editData = async function(id) {
                             <option value="DITOLAK" ${data.status === 'DITOLAK' ? 'selected' : ''}>Ditolak</option>
                         </select>
                     </div>
-                    <div style="margin-bottom: 15px;">
+
+                    <div style="margin-bottom: 10px;">
                         <label>Catatan:</label>
                         <textarea id="edit-notes" class="swal2-textarea" style="margin: 5px 0;">${data.notes || ''}</textarea>
                     </div>
                 </div>
             `,
+            width: '800px',
             focusConfirm: false,
             showCancelButton: true,
             confirmButtonText: 'Update Data',
             cancelButtonText: 'Batal',
             preConfirm: () => {
                 return {
+                    reg_number: document.getElementById('edit-reg-number').value,
+                    reg_date: document.getElementById('edit-reg-date').value,
+                    service_code: document.getElementById('edit-service-code').value,
                     nik: document.getElementById('edit-nik').value,
                     name: document.getElementById('edit-name').value,
                     phone_number: document.getElementById('edit-phone').value,
                     email: document.getElementById('edit-email').value,
+                    no_skpwni: document.getElementById('edit-no-skpwni').value,
+                    no_skdwni: document.getElementById('edit-no-skdwni').value,
+                    no_kk: document.getElementById('edit-no-kk').value,
+                    no_skbwni: document.getElementById('edit-no-skbwni').value,
                     status: document.getElementById('edit-status').value,
                     notes: document.getElementById('edit-notes').value
                 }
@@ -1544,10 +1610,10 @@ window.editData = async function(id) {
         });
 
         if (formValues) {
-            // Gabungkan data lama dengan data baru
+            // Merge old data with new form values
             const updateData = { ...data, ...formValues };
             
-            // Kirim update ke server
+            // Send update to server
             const updateRes = await fetch(`/api/pencatatan/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
@@ -1570,6 +1636,11 @@ window.editData = async function(id) {
         showNotification('Terjadi kesalahan saat edit data', 'error');
     }
 };
+
+// ==============================================================================
+// AKHIR DARI KODE YANG DIPERBARUI
+// ==============================================================================
+
 
 window.deleteData = async function(id) {
     try {
